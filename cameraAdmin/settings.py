@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-p&yrx=zz#b!$77nb58)yhnjgn5m23z9%lwe%q7(ypfl(#&+kh)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'cameraadmin']
 
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "helloworld",
 ]
 
 MIDDLEWARE = [
