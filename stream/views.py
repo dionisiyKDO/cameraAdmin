@@ -3,6 +3,7 @@ from django.shortcuts import render
 import cv2
 import threading
 
+# ABOBA
 # Set to True for mock testing, False for real multiple cameras
 USE_MOCK = True
 
@@ -32,7 +33,7 @@ def list_connected_cameras():
     else:
         connected_cameras = []
         for index in range(10):  # TODO: Replace with logic to find connected cameras instead of hardcoded 10 cameras
-            cap = cv2.VideoCapture(index)
+            cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
             if cap.isOpened():
                 connected_cameras.append(
                     index
@@ -49,11 +50,11 @@ def create_camera_instance(camera_id):
             if USE_MOCK:
                 # All mock cameras use the same physical camera
                 if physical_camera is None:
-                    physical_camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+                    physical_camera = cv2.VideoCapture(0)
                 camera_instances[camera_id] = physical_camera
             else:
                 # Create a new instance for each real camera
-                camera_instances[camera_id] = cv2.VideoCapture(camera_id, cv2.CAP_DSHOW)
+                camera_instances[camera_id] = cv2.VideoCapture(camera_id)
 
 def release_camera_instance(camera_id):
     """Release a camera instance."""
