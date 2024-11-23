@@ -1,19 +1,32 @@
-
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <h1 class="title">Camera Administration Dashboard</h1>
-    <div class="form-row">
-        <select id="cameraSelector" class="input-field bg-gray-800">
-            <option value="">Select a Camera</option>
-            {% for camera in connected_cameras %}
-                <option value="{{ camera }}" class="bg-gray-800">Camera {{ camera }}</option>
-            {% endfor %}
-        </select>
-        <button onclick="addCamera()" class="button add-button">Add Camera</button>
+<div class="min-h-screen bg-gray-900 text-white p-4">
+    <!-- Head Section -->
+    <div class="bg-gray-800 rounded-lg p-3 mb-6">
+        <h1 class="text-3xl font-bold mb-4 text-center">Camera Administration Dashboard</h1>
+        <div class="flex items-center justify-between gap-4">
+            <!-- Camera Selector -->
+            <select id="cameraSelector" class="w-full max-w-xs p-3 rounded-lg bg-gray-700 text-gray-300">
+                <option value="" disabled selected>Select a Camera</option>
+                {% for camera in connected_cameras %}
+                    <option value="{{ camera }}">Camera {{ camera }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Add Camera Button -->
+            <button 
+                onclick="addCamera()" 
+                class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition-all duration-200">
+                Add Camera
+            </button>
+        </div>
     </div>
-    <div class="camera-grid" id="cameraGrid"></div>
+
+    <!-- Camera Grid Section -->
+    <div id="cameraGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Dynamic camera cards will be appended here -->
+    </div>
 </div>
 
 <script>
@@ -23,6 +36,7 @@
         const cameraSelector = document.getElementById("cameraSelector");
         const cameraId = cameraSelector.value;
 
+        // Check if a camera is selected
         if (!cameraId) {
             alert("Please select a camera.");
             return;
@@ -37,16 +51,20 @@
         // Create the camera card
         const cameraCard = document.createElement("div");
         cameraCard.id = `camera-${cameraId}`;
-        cameraCard.className = "camera-card";
+        cameraCard.className = "bg-gray-800 border border-gray-700 rounded-lg shadow-md flex flex-col";
         cameraCard.innerHTML = `
-            <div class="card-header">
-                <h2>Camera ${cameraId}</h2>
+            <!-- Camera Header -->
+            <div class="flex justify-between items-center px-4 py-4">
+                <h2 class="text-lg font-bold">Camera ${cameraId}</h2>
+                <button onclick="removeCamera('${cameraId}')" 
+                    class="text-red-500 hover:text-red-600 transition-all duration-200">
+                    Remove Camera
+                </button>
             </div>
-            <div class="card-content">
-                <img src="/video_feed/${cameraId}/" alt="Camera Feed" class="video">
-            </div>
-            <div class="card-footer">
-                <button onclick="removeCamera('${cameraId}')" class="button remove-button">Remove</button>
+
+            <!-- Camera Video Feed -->
+            <div class="bg-gray-700 rounded-b-lg overflow-hidden aspect-video">
+                <img src="/video_feed/${cameraId}/" alt="Camera Feed" class="w-full h-full object-cover">
             </div>
         `;
 

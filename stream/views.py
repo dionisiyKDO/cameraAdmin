@@ -4,10 +4,10 @@ import cv2
 import threading
 
 # Set to True for mock testing, False for real multiple cameras
-USE_MOCK = False
+USE_MOCK = True
 
 # Mock settings
-mock_camera_ids = [0, 1, 2]  # Simulating two cameras with the same physical camera
+mock_camera_ids = [0, 1, 2, 3, 4, 5, 6]  # Simulating two cameras with the same physical camera
 physical_camera = None  # Will be initialized if USE_MOCK is True
 
 
