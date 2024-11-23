@@ -1,10 +1,68 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Video Stream</title>
-</head>
-<body>
-    <h1>Live Video Stream</h1>
-    <img src="/video_feed/" width="640" height="480" />
-</body>
-</html>
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="title">Camera Administration Dashboard</h1>
+    <div class="form-row">
+        <select id="cameraSelector" class="input-field bg-gray-800">
+            <option value="">Select a Camera</option>
+            {% for camera in connected_cameras %}
+                <option value="{{ camera }}" class="bg-gray-800">Camera {{ camera }}</option>
+            {% endfor %}
+        </select>
+        <button onclick="addCamera()" class="button add-button">Add Camera</button>
+    </div>
+    <div class="camera-grid" id="cameraGrid"></div>
+</div>
+
+<script>
+    const cameraGrid = document.getElementById("cameraGrid");
+
+    function addCamera() {
+        const cameraSelector = document.getElementById("cameraSelector");
+        const cameraId = cameraSelector.value;
+
+        if (!cameraId) {
+            alert("Please select a camera.");
+            return;
+        }
+
+        // Check if the camera is already added
+        if (document.getElementById(`camera-${cameraId}`)) {
+            alert("This camera is already added.");
+            return;
+        }
+
+        // Create the camera card
+        const cameraCard = document.createElement("div");
+        cameraCard.id = `camera-${cameraId}`;
+        cameraCard.className = "camera-card";
+        cameraCard.innerHTML = `
+            <div class="card-header">
+                <h2>Camera ${cameraId}</h2>
+            </div>
+            <div class="card-content">
+                <img src="/video_feed/${cameraId}/" alt="Camera Feed" class="video">
+            </div>
+            <div class="card-footer">
+                <button onclick="removeCamera('${cameraId}')" class="button remove-button">Remove</button>
+            </div>
+        `;
+
+        cameraGrid.appendChild(cameraCard);
+    }
+
+    function removeCamera(cameraId) {
+        const cameraCard = document.getElementById(`camera-${cameraId}`);
+        if (cameraCard) {
+            cameraCard.remove();
+
+            // Inform the server to release the camera
+            fetch(`/release_camera/${cameraId}/`, { method: "POST" })
+                .then(response => response.json())
+                .then(data => console.log(data));
+        }
+    }
+</script>
+{% endblock %}
