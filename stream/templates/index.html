@@ -56,15 +56,21 @@
             <!-- Camera Header -->
             <div class="flex justify-between items-center px-4 py-4">
                 <h2 class="text-lg font-bold">Camera ${cameraId}</h2>
-                <button onclick="removeCamera('${cameraId}')" 
-                    class="text-red-500 hover:text-red-600 transition-all duration-200">
-                    Remove Camera
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="takeScreenshot('${cameraId}')" 
+                        class="text-green-500 hover:text-green-600 transition-all duration-200">
+                        Screenshot
+                    </button>
+                    <button onclick="removeCamera('${cameraId}')" 
+                        class="text-red-500 hover:text-red-600 transition-all duration-200">
+                        Remove Camera
+                    </button>
+                </div>
             </div>
 
             <!-- Camera Video Feed -->
             <div class="bg-gray-700 rounded-b-lg overflow-hidden aspect-video">
-                <img src="/video_feed/${cameraId}/" alt="Camera Feed" class="w-full h-full object-cover">
+                <img src="/video_feed/${cameraId}/" id="camera-feed-${cameraId}" alt="Camera Feed" class="w-full h-full object-cover">
             </div>
         `;
 
@@ -82,5 +88,29 @@
                 .then(data => console.log(data));
         }
     }
+
+    function takeScreenshot(cameraId) {
+        const cameraFeed = document.getElementById(`camera-feed-${cameraId}`);
+    
+        // Save image using canvas, draw the current frame onto the canvas, and create a download link for the image
+        const canvas = document.createElement("canvas");
+        canvas.width = cameraFeed.naturalWidth;
+        canvas.height = cameraFeed.naturalHeight;
+    
+        // Save the frame to the canvas
+        const context = canvas.getContext("2d");
+        context.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
+    
+        // Get current date for the filename string
+        const now = new Date();
+        const formattedDate = now.toISOString().replace(/:/g, '-').replace('T', '_').split('.')[0]; // e.g., 2024-11-25_10-15-30
+    
+        // Create a download link for the image
+        const link = document.createElement("a");
+        link.download = `Camera_${cameraId}_Screenshot_${formattedDate}.jpg`; // Filename includes the date
+        link.href = canvas.toDataURL("image/jpeg");
+        link.click();
+    }
+    
 </script>
 {% endblock %}
