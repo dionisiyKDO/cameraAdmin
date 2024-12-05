@@ -1,9 +1,15 @@
 from django.http import StreamingHttpResponse, JsonResponse
 from django.shortcuts import render
 import cv2
+import os
 import threading
+from .models import Screenshot
+from django.core.files.storage import default_storage
+from django.utils.timezone import now
+from django.conf import settings
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 
-# ABOBA
 # Set to True for mock testing, False for real multiple cameras
 USE_MOCK = True
 
@@ -24,6 +30,15 @@ def index(request):
     connected_cameras = list_connected_cameras()
     context = {"connected_cameras": connected_cameras}
     return render(request, "index.html", context)
+
+def screenshots_list(request):
+    """Render the page to view and search screenshots."""
+    query = request.GET.get("search", "")
+    screenshots = Screenshot.objects.all()
+    if query:
+        screenshots = screenshots.filter(camera_id__icontains=query)
+    context = {"screenshots": screenshots, "query": query}
+    return render(request, "screenshots_list.html", context)
 
 
 def list_connected_cameras():
@@ -100,3 +115,32 @@ def gen_frames(camera_id):
             # Yield the frame in byte format, stolen from the internet :)
             yield (b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
 
+@csrf_exempt
+def save_screenshot(request, camera_id):
+    """Save a screenshot to the server and record metadata in the database."""
+    try:
+        # Generate file name and path
+        formatted_time = now().strftime("%Y-%m-%d_%H-%M-%S")
+        file_name = f"camera_{camera_id}_screenshot_{formatted_time}.jpg"
+        
+        # Get upload directory and file path
+        upload_dir = os.path.join(settings.MEDIA_ROOT, "screenshots")
+        file_path = os.path.join(upload_dir, file_name)
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        # Capture the frame from the camera instance
+        # create_camera_instance(camera_id)
+        camera = camera_instances[camera_id]
+        success, frame = camera.read()
+        if not success:
+            return JsonResponse({"error": "Failed to capture frame"}, status=500)
+        
+        # Save the frame as an image file
+        cv2.imwrite(file_path, frame)
+        
+        # Save metadata to the database
+        Screenshot.objects.create(camera_id=camera_id, file_path=file_name)
+        
+        return JsonResponse({"status": "success", "file_path": file_name})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

@@ -67,8 +67,8 @@ class StreamUnitTests(TestCase):
         self.assertGreater(len(cameras), 0)  # Список не должен быть пустым
 
     def test_thread_safety_with_multiple_cameras(self):
-         """Тест потокобезопасности при создании и освобождении камер."""
-         from stream.views import lock  # Убедимся, что lock используется корректно
+        """Тест потокобезопасности при создании и освобождении камер."""
+        from stream.views import lock  # Убедимся, что lock используется корректно
 
         def create_and_release(self, camera_id):
             """Функция для создания и освобождения камеры в потоке."""

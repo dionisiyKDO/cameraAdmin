@@ -90,27 +90,18 @@
     }
 
     function takeScreenshot(cameraId) {
-        const cameraFeed = document.getElementById(`camera-feed-${cameraId}`);
-    
-        // Save image using canvas, draw the current frame onto the canvas, and create a download link for the image
-        const canvas = document.createElement("canvas");
-        canvas.width = cameraFeed.naturalWidth;
-        canvas.height = cameraFeed.naturalHeight;
-    
-        // Save the frame to the canvas
-        const context = canvas.getContext("2d");
-        context.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
-    
-        // Get current date for the filename string
-        const now = new Date();
-        const formattedDate = now.toISOString().replace(/:/g, '-').replace('T', '_').split('.')[0]; // e.g., 2024-11-25_10-15-30
-    
-        // Create a download link for the image
-        const link = document.createElement("a");
-        link.download = `Camera_${cameraId}_Screenshot_${formattedDate}.jpg`; // Filename includes the date
-        link.href = canvas.toDataURL("image/jpeg");
-        link.click();
+        fetch(`/save_screenshot/${cameraId}/`, { method: "POST" })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    alert("Screenshot saved successfully!");
+                } else {
+                    alert("Failed to save screenshot: " + data.error);
+                }
+            })
+            .catch(error => console.error("Error saving screenshot:", error));
     }
+    
     
 </script>
 {% endblock %}
