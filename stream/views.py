@@ -144,3 +144,22 @@ def save_screenshot(request, camera_id):
         return JsonResponse({"status": "success", "file_path": file_name})
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+@csrf_exempt
+def delete_screenshot(request, screenshot_id):
+    if request.method == "POST":
+        try:
+            # Get the screenshot from the database
+            screenshot = Screenshot.objects.get(id=screenshot_id) 
+            
+            # Delete the file from the server
+            file_path = os.path.join(settings.MEDIA_ROOT, "screenshots", screenshot.file_path) 
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            
+            # Delete the screenshot entry from the database
+            screenshot.delete() 
+            return JsonResponse({"status": "success", "screenshot_id": screenshot_id})
+        except Screenshot.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Screenshot not found"}, status=404)
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)

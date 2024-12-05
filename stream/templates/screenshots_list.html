@@ -21,15 +21,23 @@
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for screenshot in screenshots %}
-        <div class="bg-gray-800 border border-gray-700 rounded-lg shadow-md">
+        <div id="screenshot-{{ screenshot.id }}" class="bg-gray-800 border border-gray-700 rounded-lg shadow-md flex flex-col">
             <img 
                 src="{{ MEDIA_URL }}screenshots/{{ screenshot.file_path }}" 
                 alt="Screenshot {{ MEDIA_URL }} asd" 
                 class="rounded-t-lg w-full h-48 object-cover"
             />
-            <div class="p-3">
-                <h2 class="text-lg font-bold">Camera {{ screenshot.camera_id }}</h2>
-                <p class="text-sm text-gray-400">{{ screenshot.timestamp }}</p>
+            <div class="p-3 flex justify-between">
+                <div>
+                    <h2 class="text-lg font-bold">Camera {{ screenshot.camera_id }}</h2>
+                    <p class="text-sm text-gray-400">{{ screenshot.timestamp }}</p>
+                </div>
+                <div class="flex items-center">
+                    <button onclick="deleteScreenshot('{{ screenshot.id }}')" 
+                        class="text-red-500 hover:text-red-600 transition-all duration-200">
+                        Delete
+                    </button>
+                </div>
             </div>
         </div>
     {% empty %}
@@ -37,4 +45,23 @@
     {% endfor %}
 </div>
 
+<script>
+    function deleteScreenshot(screenshotId) {
+        const confirmed = confirm("Are you sure you want to delete this screenshot?");
+        if (!confirmed) return;
+
+        fetch(`/delete_screenshot/${screenshotId}/`, {
+            method: "POST",
+        })
+        .then(response => {
+            if (response.ok) {
+                // Remove the screenshot card from the DOM
+                const screenshotCard = document.getElementById(`screenshot-${screenshotId}`);
+                if (screenshotCard) screenshotCard.remove();
+            } else {
+                alert("Failed to delete the screenshot. Please try again.");
+            }
+        });
+    }
+</script>
 {% endblock %}
