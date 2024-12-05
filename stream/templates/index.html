@@ -1,33 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-900 text-white p-4">
-    <!-- Head Section -->
-    <div class="bg-gray-800 rounded-lg p-3 mb-6">
-        <h1 class="text-3xl font-bold mb-4 text-center">Camera Administration Dashboard</h1>
-        <div class="flex items-center justify-between gap-4">
-            <!-- Camera Selector -->
-            <select id="cameraSelector" class="w-full max-w-xs p-3 rounded-lg bg-gray-700 text-gray-300">
-                <option value="" disabled selected>Select a Camera</option>
-                {% for camera in connected_cameras %}
-                    <option value="{{ camera }}">Camera {{ camera }}</option>
-                {% endfor %}
-            </select>
+<!-- Head Section -->
+<div class="bg-gray-800 rounded-lg p-3 mb-6">
+    <h1 class="text-3xl font-bold mb-4 text-center">Camera Administration Dashboard</h1>
+    <div class="flex items-center justify-between gap-4">
+        <!-- Camera Selector -->
+        <select id="cameraSelector" class="w-full max-w-xs p-3 rounded-lg bg-gray-700 text-gray-300">
+            <option value="" disabled selected>Select a Camera</option>
+            {% for camera in connected_cameras %}
+                <option value="{{ camera }}">Camera {{ camera }}</option>
+            {% endfor %}
+        </select>
 
-            <!-- Add Camera Button -->
-            <button 
-                onclick="addCamera()" 
-                class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition-all duration-200">
-                Add Camera
-            </button>
-        </div>
-    </div>
-
-    <!-- Camera Grid Section -->
-    <div id="cameraGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Dynamic camera cards will be appended here -->
+        <!-- Add Camera Button -->
+        <button 
+            onclick="addCamera()" 
+            class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition-all duration-200">
+            Add Camera
+        </button>
     </div>
 </div>
+
+<!-- Camera Grid Section -->
+<div id="cameraGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Dynamic camera cards will be appended here -->
+</div>
+
 
 <script>
     const cameraGrid = document.getElementById("cameraGrid");

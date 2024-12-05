@@ -7,7 +7,27 @@
     {% endblock %}
 </head>
 <body class="bg-gray-900 text-white">
-    <div id="content">{% block content %}{% endblock %}</div>
+    <div id="content">
+        <div class="min-h-screen bg-gray-900 text-white p-4">
+            <!-- Navigation Bar -->
+            <div class="bg-gray-800 rounded-lg p-3 mb-6 flex items-center justify-between shadow-md">
+                <div class="text-xl font-bold">Admin Dashboard</div>
+                <div class="flex gap-4">
+                    <a 
+                        href="/" 
+                        class="text-gray-300 hover:text-white px-3 py-2 rounded-md transition-all duration-200">
+                        Home
+                    </a>
+                    <a 
+                        href="/screenshots" 
+                        class="text-gray-300 hover:text-white px-3 py-2 rounded-md transition-all duration-200">
+                        Screenshots
+                    </a>
+                </div>
+            </div>
+            
+            {% block content %}{% endblock %}
+        </div>
     <div id="footer">
         {% block footer %}
         {% endblock %}

@@ -1,41 +1,40 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-900 text-white p-4">
-    <div class="bg-gray-800 rounded-lg p-3 mb-6">
-        <h1 class="text-3xl font-bold mb-4 text-center">Saved Screenshots</h1>
-        <form method="get" class="mb-4">
-            <input 
-                type="text" 
-                name="search" 
-                placeholder="Search by Camera ID" 
-                value="{{ query }}" 
-                class="w-full max-w-md p-3 rounded-lg bg-gray-700 text-gray-300"
-            />
-            <button 
-                type="submit" 
-                class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition-all duration-200">
-                Search
-            </button>
-        </form>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for screenshot in screenshots %}
-            <div class="bg-gray-800 border border-gray-700 rounded-lg shadow-md">
-                <img 
-                    src="{{ MEDIA_URL }}screenshots/{{ screenshot.file_path }}" 
-                    alt="Screenshot {{ MEDIA_URL }} asd" 
-                    class="rounded-t-lg w-full h-48 object-cover"
-                />
-                <div class="p-3">
-                    <h2 class="text-lg font-bold">Camera {{ screenshot.camera_id }}</h2>
-                    <p class="text-sm text-gray-400">{{ screenshot.timestamp }}</p>
-                </div>
-            </div>
-        {% empty %}
-            <p class="text-gray-400">No screenshots found.</p>
-        {% endfor %}
-    </div>
+<div class="bg-gray-800 rounded-lg p-3 mb-6">
+    <h1 class="text-3xl font-bold mb-4 text-center">Saved Screenshots</h1>
+    <form method="get" class="mb-4">
+        <input 
+            type="text" 
+            name="search" 
+            placeholder="Search by Camera ID" 
+            value="{{ query }}" 
+            class="w-full max-w-md p-3 rounded-lg bg-gray-700 text-gray-300"
+        />
+        <button 
+            type="submit" 
+            class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition-all duration-200">
+            Search
+        </button>
+    </form>
 </div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for screenshot in screenshots %}
+        <div class="bg-gray-800 border border-gray-700 rounded-lg shadow-md">
+            <img 
+                src="{{ MEDIA_URL }}screenshots/{{ screenshot.file_path }}" 
+                alt="Screenshot {{ MEDIA_URL }} asd" 
+                class="rounded-t-lg w-full h-48 object-cover"
+            />
+            <div class="p-3">
+                <h2 class="text-lg font-bold">Camera {{ screenshot.camera_id }}</h2>
+                <p class="text-sm text-gray-400">{{ screenshot.timestamp }}</p>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-gray-400">No screenshots found.</p>
+    {% endfor %}
+</div>
+
 {% endblock %}
