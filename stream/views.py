@@ -109,15 +109,30 @@ def gen_frames(camera_id):
         if not success:  # success is True if a frame was read successfully
             break
         else:
+            # Detect cats in the frame
+            gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # Convert to grayscale for detection
+            cascade_path = os.path.join(settings.BASE_DIR, "cascades", "haarcascade_frontalcatface.xml")
+            cat_cascade = cv2.CascadeClassifier(cascade_path)
+            cats = cat_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=5, minSize=(75, 75))
+
+            if cat_cascade.empty():
+                raise Exception(f"Error loading cat cascade. Check if the file exists at {cascade_path}")
+
+            # Draw rectangles around detected cats
+            for (x, y, w, h) in cats:
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+
             # Encode the frame to JPEG format
             ret, buffer = cv2.imencode(".jpg", frame)
             frame = buffer.tobytes()
-            # Yield the frame in byte format, stolen from the internet :)
+
+            # Yield the frame in byte format
             yield (b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
+
 
 @csrf_exempt
 def save_screenshot(request, camera_id):
-    """Save a screenshot to the server and record metadata in the database."""
+    """Save a screenshot to the server with detected cats highlighted and record metadata in the database."""
     try:
         # Generate file name and path
         formatted_time = now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -129,13 +144,25 @@ def save_screenshot(request, camera_id):
         os.makedirs(upload_dir, exist_ok=True)
         
         # Capture the frame from the camera instance
-        # create_camera_instance(camera_id)
         camera = camera_instances[camera_id]
         success, frame = camera.read()
         if not success:
             return JsonResponse({"error": "Failed to capture frame"}, status=500)
         
-        # Save the frame as an image file
+        # Detect cats in the frame
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # Convert to grayscale for detection
+        cascade_path = os.path.join(settings.BASE_DIR, "cascades", "haarcascade_frontalcatface.xml")
+        cat_cascade = cv2.CascadeClassifier(cascade_path)
+        
+        if cat_cascade.empty():
+            raise Exception(f"Error loading cat cascade. Check if the file exists at {cascade_path}")
+        
+        # Detect cats and draw rectangles
+        cats = cat_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=5, minSize=(75, 75))
+        for (x, y, w, h) in cats:
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        
+        # Save the frame with rectangles as an image file
         cv2.imwrite(file_path, frame)
         
         # Save metadata to the database
@@ -144,6 +171,7 @@ def save_screenshot(request, camera_id):
         return JsonResponse({"status": "success", "file_path": file_name})
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
 
 @csrf_exempt
 def delete_screenshot(request, screenshot_id):
